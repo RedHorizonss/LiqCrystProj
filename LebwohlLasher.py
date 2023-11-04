@@ -29,6 +29,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+np.random.seed(42)
+
 #=======================================================================
 def initdat(nmax):
     """
@@ -43,53 +45,6 @@ def initdat(nmax):
     """
     arr = np.random.random_sample((nmax,nmax))*2.0*np.pi
     return arr
-#=======================================================================
-def plotdat(arr,pflag,nmax):
-    """
-    Arguments:
-	  arr (float(nmax,nmax)) = array that contains lattice data;
-	  pflag (int) = parameter to control plotting;
-      nmax (int) = side length of square lattice.
-    Description:
-      Function to make a pretty plot of the data array.  Makes use of the
-      quiver plot style in matplotlib.  Use pflag to control style:
-        pflag = 0 for no plot (for scripted operation);
-        pflag = 1 for energy plot;
-        pflag = 2 for angles plot;
-        pflag = 3 for black plot.
-	  The angles plot uses a cyclic color map representing the range from
-	  0 to pi.  The energy plot is normalised to the energy range of the
-	  current frame.
-	Returns:
-      NULL
-    """
-    if pflag==0:
-        return
-    u = np.cos(arr)
-    v = np.sin(arr)
-    x = np.arange(nmax)
-    y = np.arange(nmax)
-    cols = np.zeros((nmax,nmax))
-    if pflag==1: # colour the arrows according to energy
-        mpl.rc('image', cmap='rainbow')
-        for i in range(nmax):
-            for j in range(nmax):
-                cols[i,j] = one_energy(arr,i,j,nmax)
-        norm = plt.Normalize(cols.min(), cols.max())
-    elif pflag==2: # colour the arrows according to angle
-        mpl.rc('image', cmap='hsv')
-        cols = arr%np.pi
-        norm = plt.Normalize(vmin=0, vmax=np.pi)
-    else:
-        mpl.rc('image', cmap='gist_gray')
-        cols = np.zeros_like(arr)
-        norm = plt.Normalize(vmin=0, vmax=1)
-
-    quiveropts = dict(headlength=0,pivot='middle',headwidth=1,scale=1.1*nmax)
-    fig, ax = plt.subplots()
-    q = ax.quiver(x, y, u, v, cols,norm=norm, **quiveropts)
-    ax.set_aspect('equal')
-    plt.show()
 #=======================================================================
 def savedat(arr,nsteps,Ts,runtime,ratio,energy,order,nmax):
     """
@@ -111,7 +66,7 @@ def savedat(arr,nsteps,Ts,runtime,ratio,energy,order,nmax):
     """
     # Create filename based on current date and time.
     current_datetime = datetime.datetime.now().strftime("%a-%d-%b-%Y-at-%I-%M-%S%p")
-    filename = "LL-Output-{:s}.txt".format(current_datetime)
+    filename = "outputs/LL-Output-{:s}.txt".format(current_datetime)
     FileOut = open(filename,"w")
     # Write a header with run parameters
     print("#=====================================================",file=FileOut)
@@ -126,6 +81,13 @@ def savedat(arr,nsteps,Ts,runtime,ratio,energy,order,nmax):
     # Write the columns of data
     for i in range(nsteps+1):
         print("   {:05d}    {:6.4f} {:12.4f}  {:6.4f} ".format(i,ratio[i],energy[i],order[i]),file=FileOut)
+    FileOut.close()
+#=======================================================================
+def timeInfo(nsteps,Ts,runtime,nmax):
+    version = "Original"
+    filename = "outputs/timeInfo.csv"
+    FileOut = open(filename,"a")
+    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {}".format(nmax,nmax, nsteps, Ts, runtime, version),file=FileOut)
     FileOut.close()
 #=======================================================================
 def one_energy(arr,ix,iy,nmax):
@@ -254,14 +216,13 @@ def MC_step(arr,Ts,nmax):
                     arr[ix,iy] -= ang
     return accept/(nmax*nmax)
 #=======================================================================
-def main(program, nsteps, nmax, temp, pflag):
+def main(program, nsteps, nmax, temp):
     """
     Arguments:
 	  program (string) = the name of the program;
 	  nsteps (int) = number of Monte Carlo steps (MCS) to perform;
       nmax (int) = side length of square lattice to simulate;
 	  temp (float) = reduced temperature (range 0 to 2);
-	  pflag (int) = a flag to control plotting.
     Description:
       This is the main function running the Lebwohl-Lasher simulation.
     Returns:
@@ -269,8 +230,6 @@ def main(program, nsteps, nmax, temp, pflag):
     """
     # Create and initialise lattice
     lattice = initdat(nmax)
-    # Plot initial frame of lattice
-    plotdat(lattice,pflag,nmax)
     # Create arrays to store energy, acceptance ratio and order parameter
     energy = np.zeros(nsteps+1,dtype=np.dtype)
     ratio = np.zeros(nsteps+1,dtype=np.dtype)
@@ -293,19 +252,18 @@ def main(program, nsteps, nmax, temp, pflag):
     print("{}: Size: {:d}, Steps: {:d}, T*: {:5.3f}: Order: {:5.3f}, Time: {:8.6f} s".format(program, nmax,nsteps,temp,order[nsteps-1],runtime))
     # Plot final frame of lattice and generate output file
     savedat(lattice,nsteps,temp,runtime,ratio,energy,order,nmax)
-    plotdat(lattice,pflag,nmax)
+    timeInfo(nsteps, temp, runtime, nmax)
 #=======================================================================
 # Main part of program, getting command line arguments and calling
 # main simulation function.
 #
 if __name__ == '__main__':
-    if int(len(sys.argv)) == 5:
+    if int(len(sys.argv)) == 4:
         PROGNAME = sys.argv[0]
         ITERATIONS = int(sys.argv[1])
         SIZE = int(sys.argv[2])
         TEMPERATURE = float(sys.argv[3])
-        PLOTFLAG = int(sys.argv[4])
-        main(PROGNAME, ITERATIONS, SIZE, TEMPERATURE, PLOTFLAG)
+        main(PROGNAME, ITERATIONS, SIZE, TEMPERATURE)
     else:
-        print("Usage: python {} <ITERATIONS> <SIZE> <TEMPERATURE> <PLOTFLAG>".format(sys.argv[0]))
+        print("Usage: python {} <ITERATIONS> <SIZE> <TEMPERATURE>".format(sys.argv[0]))
 #=======================================================================
