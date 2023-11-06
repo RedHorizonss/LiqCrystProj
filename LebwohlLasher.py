@@ -26,8 +26,6 @@ import sys
 import time
 import datetime
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 np.random.seed(42)
 
