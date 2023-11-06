@@ -1,6 +1,8 @@
 import pytest
 import numpy as np
-from LebwohlLasher_MPI import initdat, one_energy, all_energy, get_order, MC_step
+from LebwohlLasher_Numba import initdat, one_energy, all_energy, get_order, MC_step
+
+##TODO: add a way to check the last like of the most recent file or maybe just the output.
 
 #Setting the lattice sze as a global number to be used.
 # This is because the code doesn't have any error catch statements and can only take a positive number
@@ -38,6 +40,8 @@ def test_all_energy():
 def test_get_order():
     # Test the order parameter calculation for the lattice
     arr = np.random.random_sample((nmax, nmax)) * 2.0 * np.pi
+    print(arr)
+    print(nmax)
     # Calculate the order parameter
     order = get_order(arr, nmax)
     assert order == 0.3238593394231049
@@ -50,4 +54,4 @@ def test_MC_step():
     # Perform a Monte Carlo step and get the acceptance ratio
     acceptance_ratio = MC_step(arr, temp, nmax)  
     #Check if the acceptance ratio is within the valid range [0, 1]
-    assert 0 <= acceptance_ratio <= 1 
+    assert acceptance_ratio == 0.52
