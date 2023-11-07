@@ -14,10 +14,9 @@ def initdat(nmax):
     return arr
 
 def timeInfo(nsteps,Ts,runtime,nmax):
-    version = "MPI"
-    filename = "outputs/timeInfo.csv"
+    filename = "MPI/timeInfo_MPI.csv"
     FileOut = open(filename,"a")
-    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {}".format(nmax,nmax, nsteps, Ts, runtime, version),file=FileOut)
+    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {:d}".format(nmax,nmax, nsteps, Ts, runtime, size),file=FileOut)
     FileOut.close()
   
 def one_energy(arr,ix,iy,nmax):

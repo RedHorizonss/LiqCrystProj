@@ -1,7 +1,7 @@
 import sys
 import time
 import numpy as np
-from numba import jit, prange
+from numba import jit, prange, set_num_threads
 
 np.random.seed(42)
 
@@ -10,11 +10,10 @@ def initdat(nmax):
     arr = np.random.random_sample((nmax, nmax)) * 2.0 * np.pi
     return arr
 
-def timeInfo(nsteps,Ts,runtime,nmax):
-    version = "Numba"
-    filename = "outputs/timeInfo.csv"
+def timeInfo(nsteps,Ts,runtime,nmax, num_threads):
+    filename = "Numba/timeInfo_Numba.csv"
     FileOut = open(filename,"a")
-    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {}".format(nmax,nmax, nsteps, Ts, runtime, version),file=FileOut)
+    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {:d}".format(nmax,nmax, nsteps, Ts, runtime, num_threads),file=FileOut)
     FileOut.close()
     
 @jit(nopython=True)
@@ -93,23 +92,25 @@ def main(program, nsteps, nmax, temp):
     energy[0] = all_energy(lattice,nmax)
     ratio[0] = 0.5 # ideal value
     order[0] = get_order(lattice,nmax)
-
-    # Begin doing and timing some MC steps.
-    initial = time.time()
-    for it in range(1,nsteps+1):
-        scale = 0.1+temp
-        xran = np.random.randint(0,high=nmax, size=(nmax,nmax))
-        yran = np.random.randint(0,high=nmax, size=(nmax,nmax))
-        aran = np.random.normal(scale=scale, size=(nmax,nmax))
-        
-        ratio[it] = MC_step(lattice,temp,nmax, xran, yran, aran)
-        energy[it] = all_energy(lattice,nmax)
-        order[it] = get_order(lattice,nmax)
-    final = time.time()
-    runtime = final-initial
     
-    print("{}: Size: {:d}, Steps: {:d}, T*: {:5.3f}: Order: {:5.3f}, Time: {:8.6f} s".format(program, nmax,nsteps,temp,order[nsteps-1],runtime))
-    timeInfo(nsteps, temp, runtime, nmax)
+    for num_threads in range(2,29, 2):
+        # Begin doing and timing some MC steps.
+        set_num_threads(num_threads)
+        initial = time.time()
+        for it in range(1,nsteps+1):
+            scale = 0.1+temp
+            xran = np.random.randint(0,high=nmax, size=(nmax,nmax))
+            yran = np.random.randint(0,high=nmax, size=(nmax,nmax))
+            aran = np.random.normal(scale=scale, size=(nmax,nmax))
+            
+            ratio[it] = MC_step(lattice,temp,nmax, xran, yran, aran)
+            energy[it] = all_energy(lattice,nmax)
+            order[it] = get_order(lattice,nmax)
+        final = time.time()
+        runtime = final-initial
+        
+        print("{}: Size: {:d}, Steps: {:d}, T*: {:5.3f}: Order: {:5.3f}, Time: {:8.6f} s".format(program, nmax,nsteps,temp,order[nsteps-1],runtime))
+        timeInfo(nsteps, temp, runtime, nmax, num_threads)
 
 if __name__ == '__main__':
     if int(len(sys.argv)) == 4:

@@ -64,7 +64,7 @@ def savedat(arr,nsteps,Ts,runtime,ratio,energy,order,nmax):
     """
     # Create filename based on current date and time.
     current_datetime = datetime.datetime.now().strftime("%a-%d-%b-%Y-at-%I-%M-%S%p")
-    filename = "outputs/LL-Output-{:s}.txt".format(current_datetime)
+    filename = "Original/LL-Output-{:s}.txt".format(current_datetime)
     FileOut = open(filename,"w")
     # Write a header with run parameters
     print("#=====================================================",file=FileOut)
@@ -82,10 +82,9 @@ def savedat(arr,nsteps,Ts,runtime,ratio,energy,order,nmax):
     FileOut.close()
 #=======================================================================
 def timeInfo(nsteps,Ts,runtime,nmax):
-    version = "Original"
-    filename = "outputs/timeInfo.csv"
+    filename = "Original/timeInfo_original.csv"
     FileOut = open(filename,"a")
-    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}, {}".format(nmax,nmax, nsteps, Ts, runtime, version),file=FileOut)
+    print("{:d}x{:d}, {:d}, {:5.3f}, {:8.6f}".format(nmax,nmax, nsteps, Ts, runtime),file=FileOut)
     FileOut.close()
 #=======================================================================
 def one_energy(arr,ix,iy,nmax):
@@ -183,11 +182,11 @@ def MC_step(arr,Ts,nmax):
 	Returns:
 	  accept/(nmax**2) (float) = acceptance ratio for current MCS.
     """
-    #
-    # Pre-compute some random numbers.  This is faster than
-    # using lots of individual calls.  "scale" sets the width
-    # of the distribution for the angle changes - increases
-    # with temperature.
+      #
+      # Pre-compute some random numbers.  This is faster than
+      # using lots of individual calls.  "scale" sets the width
+      # of the distribution for the angle changes - increases
+      # with temperature.
     scale=0.1+Ts
     accept = 0
     xran = np.random.randint(0,high=nmax, size=(nmax,nmax))
@@ -212,6 +211,7 @@ def MC_step(arr,Ts,nmax):
                     accept += 1
                 else:
                     arr[ix,iy] -= ang
+                    
     return accept/(nmax*nmax)
 #=======================================================================
 def main(program, nsteps, nmax, temp):
