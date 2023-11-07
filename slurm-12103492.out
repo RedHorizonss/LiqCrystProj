@@ -1,0 +1,16 @@
+Running on host compute520.bc4.acrc.priv
+Started on Tue Nov  7 18:57:07 GMT 2023
+Directory is /user/home/ym20990/LiqCrystProj
+Slurm job ID is 12103492
+This jobs runs on the following machines:
+compute520
+CPUs per task = 10
+N p Seed Steps ReachedEnd Time(s)
+
+
+Original/LebwohlLasher.py: Size: 10, Steps: 50, T*: 0.500: Order: 0.421, Time: 0.171530 s
+Original/LebwohlLasher.py: Size: 20, Steps: 50, T*: 0.500: Order: 0.492, Time: 0.646226 s
+Original/LebwohlLasher.py: Size: 50, Steps: 50, T*: 0.500: Order: 0.325, Time: 4.106398 s
+Original/LebwohlLasher.py: Size: 100, Steps: 50, T*: 0.500: Order: 0.325, Time: 16.564148 s
+Original/LebwohlLasher.py: Size: 200, Steps: 50, T*: 0.500: Order: 0.305, Time: 80.123849 s
+Original/LebwohlLasher.py: Size: 500, Steps: 50, T*: 0.500: Order: 0.262, Time: 413.113146 s

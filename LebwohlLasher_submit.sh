@@ -4,7 +4,7 @@
 #SBATCH --partition=veryshort
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=22
+#SBATCH --cpus-per-task=10
 #SBATCH --time=6:0:0
 #SBATCH --mem-per-cpu=100M
 #SBATCH --account=phys027926
@@ -27,8 +27,16 @@ echo "N p Seed Steps ReachedEnd Time(s)"
 printf "\n\n"
 
 # File run
-# mpiexec -n 22 python MPI/LebwohlLasher_MPI.py 50 50 0.5
-# mpiexec -n 22 python MPI/LebwohlLasher_MPI.py 50 50 0.5
-# mpiexec -n 22 python MPI/LebwohlLasher_MPI.py 50 50 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 10 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 20 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 50 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 100 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 200 0.5
+# mpiexec -n 10 python MPI/LebwohlLasher_MPI.py 50 500 0.5
 
-python 
+python Original/LebwohlLasher.py 50 10 0.5
+python Original/LebwohlLasher.py 50 20 0.5
+python Original/LebwohlLasher.py 50 50 0.5
+python Original/LebwohlLasher.py 50 100 0.5
+python Original/LebwohlLasher.py 50 200 0.5
+python Original/LebwohlLasher.py 50 500 0.5
